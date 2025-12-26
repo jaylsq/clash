@@ -1,10 +1,10 @@
 # 内容：Emby
 # 域名关键字匹配
-# DOMAIN-KEYWORD,cf.xmsl.org
-# DOMAIN-KEYWORD,emby.my
-# DOMAIN-KEYWORD,emby.wenjian.de
-# DOMAIN-KEYWORD,emby.025666.xyz
-# DOMAIN-KEYWORD,babybus
-# DOMAIN-KEYWORD,film.reddust.link
-# DOMAIN-KEYWORD,cflocal
-# DOMAIN-KEYWORD,789.123456.al
+DOMAIN-KEYWORD,cf.xmsl.org
+DOMAIN-KEYWORD,emby.my
+DOMAIN-KEYWORD,emby.wenjian.de
+DOMAIN-KEYWORD,emby.025666.xyz
+DOMAIN-KEYWORD,babybus
+DOMAIN-KEYWORD,film.reddust.link
+DOMAIN-KEYWORD,cflocal
+DOMAIN-KEYWORD,789.123456.al
