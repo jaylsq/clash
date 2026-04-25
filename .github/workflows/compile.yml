@@ -1,0 +1,53 @@
+name: Batch Compile Rule Sets
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install sing-box
+        run: |
+          TAG=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          VERSION=${TAG#v}
+          curl -Lo sing-box.tar.gz "https://github.com/SagerNet/sing-box/releases/download/${TAG}/sing-box-${VERSION}-linux-amd64.tar.gz"
+          tar -xzf sing-box.tar.gz
+          mv sing-box-*/sing-box .
+          chmod +x sing-box
+
+      - name: Batch Convert and Compile
+        run: |
+          # 遍历当前目录下所有的 .list 文件
+          for file in *.list; do
+            # 如果没有找到 list 文件则跳过
+            [ -e "$file" ] || continue
+            
+            # 获取文件名（不带后缀），例如 "Apple"
+            filename="${file%.*}"
+            echo "Processing $filename..."
+
+            # 1. 转换为 sing-box JSON 格式
+            echo '{"version": 1, "rules": [{"domain": [' > "${filename}.json"
+            grep -v '^#' "$file" | grep -v '^$' | sed 's/^/"/;s/$/",/' | sed '$ s/,$//' >> "${filename}.json"
+            echo ']}]}' >> "${filename}.json"
+
+            # 2. 编译为 .srs
+            ./sing-box rule-set compile "${filename}.json" -o "${filename}.srs"
+            
+            # 3. 清理临时生成的 JSON 文件
+            rm "${filename}.json"
+          done
+
+      - name: Push to Branch
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add *.srs
+          git commit -m "Batch compile SRS: $(date +'%Y-%m-%d %H:%M')" || echo "No changes to commit"
+          git push
